@@ -61,15 +61,18 @@
     <script>
         const sidebarW = 260;
         const headerH = 50;
-        // Measure actual container size to avoid overflow
         function getTreemapSize() {
             const container = document.getElementById("treemap");
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            // Fallback if container hasn't been laid out yet
             return {
-                w: container.clientWidth || (window.innerWidth - sidebarW - 1),
-                h: container.clientHeight || (window.innerHeight - headerH)
+                w: w > 0 ? w : Math.max(window.innerWidth - sidebarW - 1, 400),
+                h: h > 0 ? h : Math.max(window.innerHeight - headerH, 400)
             };
         }
-        let { w: width, h: height } = getTreemapSize();
+        let width = Math.max(window.innerWidth - sidebarW - 1, 400);
+        let height = Math.max(window.innerHeight - headerH, 400);
 
         const colorScale = d3.scaleSequential()
             .domain([0, 10])
@@ -410,7 +413,10 @@
             const withEmp = data.filter(d => d.employment);
             totalPayrollAll = d3.sum(withEmp.filter(d => d.wage_median), d => d.employment * d.wage_median);
             totalJobsAll = d3.sum(withEmp, d => d.employment);
-            render(data);
+            // Wait for layout to be fully computed before rendering
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => render(data));
+            });
         });
     </script>
 </body>
