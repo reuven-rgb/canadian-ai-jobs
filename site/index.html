@@ -149,7 +149,6 @@
             document.getElementById("stat-wages-sub").innerHTML =
                 `<span class="stat-highlight">${wagesPct}% of total Canadian payroll</span><br>in high-exposure (score \u2265 6) occupations`;
 
-            document.getElementById("stat-jobs").textContent = fmtM(totalJobs);
 
             const avgEl = document.getElementById("stat-avg");
             avgEl.textContent = weightedAvg.toFixed(1);
