@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+data/
+html/
+pages/
+scores.json
+occupations.csv
+occupations.json
+.DS_Store

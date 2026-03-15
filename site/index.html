@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exposure to the Canadian Job Market</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>AI Exposure to the Canadian Job Market</h1>
+        <div class="controls">
+            <div class="search-group">
+                <input type="text" id="search" placeholder="Search occupations..." autocomplete="off">
+                <div id="search-results" class="search-results"></div>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">AI Impact Timeline:</span>
+                <button class="filter-btn active" data-timeline="all">All</button>
+                <button class="filter-btn" data-timeline="0-2yr">0-2 yr</button>
+                <button class="filter-btn" data-timeline="2-3yr">2-3 yr</button>
+                <button class="filter-btn" data-timeline="3+yr">3+ yr</button>
+            </div>
+            <div class="legend">
+                <span class="legend-label">Low</span>
+                <div class="legend-gradient"></div>
+                <span class="legend-label">High</span>
+            </div>
+        </div>
+    </header>
+    <div class="main-layout">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-section">
+                <div class="stat-label">WAGES EXPOSED</div>
+                <div class="stat-big stat-red" id="stat-wages">-</div>
+                <div class="stat-sub" id="stat-wages-sub">annual wages in high-exposure (score &ge; 6) occupations</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="stat-label">TOTAL JOBS</div>
+                <div class="stat-big" id="stat-jobs">-</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="stat-label">WEIGHTED AVG. EXPOSURE</div>
+                <div class="stat-big" id="stat-avg">-</div>
+                <div class="stat-sub">job-weighted, 0&ndash;10 scale</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="stat-label">BREAKDOWN BY # OF JOBS</div>
+                <div id="breakdown"></div>
+            </div>
+            <div class="sidebar-section">
+                <div class="stat-label">EXPOSURE BY PAY</div>
+                <div id="exposure-pay"></div>
+            </div>
+            <div class="sidebar-section">
+                <div class="stat-label">EXPOSURE BY EDUCATION (TEER)</div>
+                <div id="exposure-teer"></div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="footer-author">by Reuven Gorsht</div>
+                <div class="footer-links">
+                    <a href="https://www.linkedin.com/in/rgorsht/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://x.com/reuvengorsht" target="_blank" rel="noopener">X</a>
+                </div>
+                <div class="footer-sources">Data: NOC 2021 (StatCan), ESDC wages, COPS 2024-2033 projections, Eloundou et al. LLM exposure scores. AI scoring by Claude.</div>
+            </div>
+        </aside>
+        <div id="treemap"></div>
+    </div>
+    <div id="tooltip" class="tooltip"></div>
+    <script>
+        const sidebarW = 260;
+        const headerH = 50;
+        // Measure actual container size to avoid overflow
+        function getTreemapSize() {
+            const container = document.getElementById("treemap");
+            return {
+                w: container.clientWidth || (window.innerWidth - sidebarW - 1),
+                h: container.clientHeight || (window.innerHeight - headerH)
+            };
+        }
+        let { w: width, h: height } = getTreemapSize();
+
+        const colorScale = d3.scaleSequential()
+            .domain([0, 10])
+            .interpolator(d3.interpolateRgbBasis(["#2d7d46", "#7ab648", "#c4d84a", "#f0c93a", "#e8842a", "#d9381e"]));
+
+        const fmt = d3.format("$,.0f");
+        const fmtB = v => {
+            if (v >= 1e12) return "$" + (v/1e12).toFixed(1) + "T";
+            if (v >= 1e9) return "$" + (v/1e9).toFixed(1) + "B";
+            if (v >= 1e6) return "$" + (v/1e6).toFixed(0) + "M";
+            return "$" + d3.format(",.0f")(v);
+        };
+        const fmtM = v => {
+            if (v >= 1e6) return (v/1e6).toFixed(1) + "M";
+            if (v >= 1e3) return (v/1e3).toFixed(0) + "K";
+            return v.toString();
+        };
+        const pct = d3.format(".0%");
+
+        const tooltip = d3.select("#tooltip");
+        const timelineLabels = {"0-2yr": "0-2 years", "2-3yr": "2-3 years", "3+yr": "3+ years"};
+        const teerLabels = {
+            1: "University degree",
+            2: "College/apprentice 2yr+",
+            3: "College/apprentice <2yr",
+            4: "High school",
+            5: "No formal education"
+        };
+        const payBuckets = [
+            { label: "<$35K", min: 0, max: 35000 },
+            { label: "$35\u201350K", min: 35000, max: 50000 },
+            { label: "$50\u201375K", min: 50000, max: 75000 },
+            { label: "$75\u2013100K", min: 75000, max: 100000 },
+            { label: "$100K+", min: 100000, max: Infinity },
+        ];
+
+        let allData = [];
+        let totalPayrollAll = 0;  // computed once from full dataset
+        let totalJobsAll = 0;
+        let activeTimeline = "all";
+        let highlightedNoc = null;
+
+        function buildTooltipHtml(dd) {
+            const empStr = dd.employment ? fmtM(dd.employment) + " workers" : "";
+            return `
+                <strong>${dd.title}</strong><br>
+                <span class="tt-dim">NOC ${dd.noc}${empStr ? " \u00b7 " + empStr : ""}</span><br>
+                AI Exposure: <strong>${dd.ai_score}/10</strong><br>
+                ${dd.ai_rationale ? `<span class="tt-dim">${dd.ai_rationale}</span><br>` : ""}
+                AI Impact Timeline: <strong>${timelineLabels[dd.timeline] || dd.timeline}</strong><br>
+                <span class="tt-dim">LLM Exposure \u2014
+                    \u03b1 (LLM alone): ${pct(dd.alpha || 0)}
+                    \u03b2 (LLM + tools): ${pct(dd.beta || 0)}
+                    \u03b3 (LLM + full tooling): ${pct(dd.gamma || 0)}</span><br>
+                ${dd.outlook ? `Demand Outlook: ${dd.outlook}<br>` : ""}
+                Median Wage: ${dd.wage_median ? fmt(dd.wage_median) : "N/A"}<br>
+                <span class="tt-dim">Range: ${dd.wage_low ? fmt(dd.wage_low) : "?"} \u2013 ${dd.wage_high ? fmt(dd.wage_high) : "?"}</span>
+            `;
+        }
+
+        function updateSidebar(data) {
+            const withEmp = data.filter(d => d.employment);
+            const totalJobs = d3.sum(withEmp, d => d.employment);
+            const weightedAvg = totalJobs > 0
+                ? d3.sum(withEmp, d => d.employment * d.ai_score) / totalJobs
+                : 0;
+
+            // Wages exposed (score >= 6), % always relative to total Canadian payroll
+            const highExp = withEmp.filter(d => d.ai_score >= 6 && d.wage_median);
+            const wagesExposed = d3.sum(highExp, d => d.employment * d.wage_median);
+            const wagesPct = totalPayrollAll > 0 ? (wagesExposed / totalPayrollAll * 100).toFixed(0) : 0;
+
+            document.getElementById("stat-wages").textContent = fmtB(wagesExposed);
+            document.getElementById("stat-wages-sub").innerHTML =
+                `<span class="stat-highlight">${wagesPct}% of total Canadian payroll</span><br>in high-exposure (score \u2265 6) occupations`;
+
+            document.getElementById("stat-jobs").textContent = fmtM(totalJobs);
+
+            const avgEl = document.getElementById("stat-avg");
+            avgEl.textContent = weightedAvg.toFixed(1);
+            avgEl.style.color = colorScale(weightedAvg);
+
+            // Breakdown by # of jobs
+            const breakdownEl = document.getElementById("breakdown");
+            breakdownEl.innerHTML = "";
+            const levels = [
+                { label: "Minimal (0-1)", min: 0, max: 1.5, color: "#2d7d46" },
+                { label: "Low (2-3)", min: 1.5, max: 3.5, color: "#7ab648" },
+                { label: "Moderate (4-5)", min: 3.5, max: 5.5, color: "#c4d84a" },
+                { label: "High (6-7)", min: 5.5, max: 7.5, color: "#e8842a" },
+                { label: "Very high (8-10)", min: 7.5, max: 10.5, color: "#d9381e" },
+            ];
+            levels.forEach(l => {
+                const jobs = d3.sum(withEmp.filter(d => d.ai_score >= l.min && d.ai_score < l.max), d => d.employment);
+                const pctVal = totalJobs > 0 ? (jobs / totalJobs * 100).toFixed(0) : 0;
+                const row = document.createElement("div");
+                row.className = "breakdown-row";
+                row.innerHTML = `<span class="bd-dot" style="background:${l.color}"></span>
+                    <span class="bd-label">${l.label}</span>
+                    <span class="bd-value">${fmtM(jobs)}</span>
+                    <span class="bd-pct">${pctVal}%</span>`;
+                breakdownEl.appendChild(row);
+            });
+
+            // Exposure by pay
+            const payEl = document.getElementById("exposure-pay");
+            payEl.innerHTML = "";
+            payBuckets.forEach(b => {
+                const bucket = withEmp.filter(d => d.wage_median && d.wage_median >= b.min && d.wage_median < b.max);
+                const bJobs = d3.sum(bucket, d => d.employment);
+                const avg = bJobs > 0 ? d3.sum(bucket, d => d.employment * d.ai_score) / bJobs : 0;
+                const row = document.createElement("div");
+                row.className = "bar-row";
+                row.innerHTML = `<span class="bar-label">${b.label}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:${avg*10}%;background:${colorScale(avg)}"></div></div>
+                    <span class="bar-value">${avg.toFixed(1)}</span>`;
+                payEl.appendChild(row);
+            });
+
+            // Exposure by TEER (no management/0)
+            const teerEl = document.getElementById("exposure-teer");
+            teerEl.innerHTML = "";
+            [1, 2, 3, 4, 5].forEach(t => {
+                const bucket = withEmp.filter(d => d.teer === t);
+                const bJobs = d3.sum(bucket, d => d.employment);
+                const avg = bJobs > 0 ? d3.sum(bucket, d => d.employment * d.ai_score) / bJobs : 0;
+                const row = document.createElement("div");
+                row.className = "bar-row";
+                row.innerHTML = `<span class="bar-label">${teerLabels[t]}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:${avg*10}%;background:${colorScale(avg)}"></div></div>
+                    <span class="bar-value">${avg.toFixed(1)}</span>`;
+                teerEl.appendChild(row);
+            });
+        }
+
+        function render(data) {
+            d3.select("#treemap").selectAll("*").remove();
+            updateSidebar(data);
+
+            // Re-measure container to avoid overflow
+            const size = getTreemapSize();
+            width = size.w;
+            height = size.h;
+
+            if (data.length === 0) {
+                d3.select("#treemap").append("p")
+                    .attr("class", "empty-msg")
+                    .text("No occupations match this filter.");
+                return;
+            }
+
+            const grouped = d3.group(data, d => d.broad_category_name);
+            const root = d3.hierarchy({
+                name: "All Occupations",
+                children: Array.from(grouped, ([key, values]) => ({
+                    name: key,
+                    children: values
+                }))
+            })
+            .sum(d => d.employment || 1000)
+            .sort((a, b) => b.value - a.value);
+
+            d3.treemap()
+                .size([width, height])
+                .padding(1)
+                .paddingTop(18)
+                .round(true)(root);
+
+            const svg = d3.select("#treemap")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const groups = svg.selectAll("g.group")
+                .data(root.children)
+                .join("g")
+                .attr("class", "group");
+
+            groups.append("rect")
+                .attr("x", d => d.x0)
+                .attr("y", d => d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("fill", "none")
+                .attr("stroke", "#333")
+                .attr("stroke-width", 1.5);
+
+            groups.append("text")
+                .attr("x", d => d.x0 + 3)
+                .attr("y", d => d.y0 + 13)
+                .text(d => {
+                    const w = d.x1 - d.x0;
+                    if (w < 60) return "";
+                    const maxChars = Math.floor(w / 6);
+                    const name = d.data.name;
+                    return name.length > maxChars ? name.slice(0, maxChars - 1) + "\u2026" : name;
+                })
+                .attr("class", "group-label");
+
+            const leaves = svg.selectAll("g.leaf")
+                .data(root.leaves())
+                .join("g")
+                .attr("class", "leaf")
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+            leaves.append("rect")
+                .attr("id", d => `tile-${d.data.noc}`)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("fill", d => colorScale(d.data.ai_score))
+                .attr("stroke", "#fff")
+                .attr("stroke-width", d => d.data.noc === highlightedNoc ? 3 : 0.5)
+                .on("mouseover", (event, d) => {
+                    tooltip.style("display", "block").html(buildTooltipHtml(d.data));
+                })
+                .on("mousemove", (event) => {
+                    const ttNode = tooltip.node();
+                    const ttW = ttNode.offsetWidth || 420;
+                    const ttH = ttNode.offsetHeight || 200;
+                    const winW = window.innerWidth;
+                    const winH = window.innerHeight;
+
+                    let left = event.pageX + 15;
+                    let top = event.pageY - 10;
+
+                    // Flip left if tooltip would go off right edge
+                    if (left + ttW > winW - 10) {
+                        left = event.pageX - ttW - 15;
+                    }
+                    // Flip up if tooltip would go off bottom edge
+                    if (top + ttH > winH - 10) {
+                        top = event.pageY - ttH - 10;
+                    }
+
+                    tooltip
+                        .style("left", left + "px")
+                        .style("top", top + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.style("display", "none");
+                });
+
+            leaves.append("text")
+                .attr("x", 3)
+                .attr("y", 12)
+                .text(d => {
+                    const w = d.x1 - d.x0;
+                    const h = d.y1 - d.y0;
+                    if (w < 36 || h < 14) return "";
+                    const maxChars = Math.floor(w / 6);
+                    const title = d.data.title;
+                    return title.length > maxChars ? title.slice(0, maxChars - 1) + "\u2026" : title;
+                })
+                .attr("class", "tile-label");
+
+            if (highlightedNoc) {
+                const tile = d3.select(`#tile-${highlightedNoc}`);
+                if (!tile.empty()) {
+                    tile.attr("stroke", "#fff").attr("stroke-width", 3);
+                    const leaf = tile.datum();
+                    if (leaf) {
+                        tooltip.style("display", "block")
+                            .html(buildTooltipHtml(leaf.data))
+                            .style("left", ((leaf.x0 + leaf.x1) / 2 + sidebarW + 15) + "px")
+                            .style("top", ((leaf.y0 + leaf.y1) / 2 + headerH + 10) + "px");
+                    }
+                }
+            }
+        }
+
+        function updateView() {
+            const filtered = activeTimeline === "all"
+                ? allData
+                : allData.filter(d => d.timeline === activeTimeline);
+            render(filtered);
+        }
+
+        // Filter buttons
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                activeTimeline = btn.dataset.timeline;
+                highlightedNoc = null;
+                updateView();
+            });
+        });
+
+        // Search
+        const searchInput = document.getElementById("search");
+        const searchResults = document.getElementById("search-results");
+
+        searchInput.addEventListener("input", () => {
+            const q = searchInput.value.trim().toLowerCase();
+            searchResults.innerHTML = "";
+            if (q.length < 2) { searchResults.style.display = "none"; return; }
+
+            const matches = allData
+                .filter(d => d.title.toLowerCase().includes(q) || d.noc.includes(q))
+                .slice(0, 10);
+            if (matches.length === 0) { searchResults.style.display = "none"; return; }
+
+            matches.forEach(d => {
+                const div = document.createElement("div");
+                div.className = "search-result-item";
+                div.innerHTML = `<span class="sr-title">${d.title}</span> <span class="sr-meta">NOC ${d.noc} \u00b7 ${d.ai_score}/10 \u00b7 ${timelineLabels[d.timeline] || d.timeline}</span>`;
+                div.addEventListener("click", () => {
+                    highlightedNoc = d.noc;
+                    searchInput.value = d.title;
+                    searchResults.style.display = "none";
+                    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                    document.querySelector('[data-timeline="all"]').classList.add("active");
+                    activeTimeline = "all";
+                    updateView();
+                });
+                searchResults.appendChild(div);
+            });
+            searchResults.style.display = "block";
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".search-group")) searchResults.style.display = "none";
+        });
+
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                searchInput.value = "";
+                searchResults.style.display = "none";
+                highlightedNoc = null;
+                tooltip.style("display", "none");
+                updateView();
+            }
+        });
+
+        d3.json("data.json").then(data => {
+            allData = data;
+            // Compute global totals once from full dataset
+            const withEmp = data.filter(d => d.employment);
+            totalPayrollAll = d3.sum(withEmp.filter(d => d.wage_median), d => d.employment * d.wage_median);
+            totalJobsAll = d3.sum(withEmp, d => d.employment);
+            render(data);
+        });
+    </script>
+</body>
+</html>

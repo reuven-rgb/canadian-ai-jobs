@@ -1,0 +1,13 @@
+[project]
+name = "canadian-ai-jobs"
+version = "0.1.0"
+description = "Canadian AI exposure of the job market — interactive treemap visualization"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx",
+    "pandas",
+]
+
+[project.optional-dependencies]
+scrape = ["playwright", "beautifulsoup4"]
+score = ["anthropic", "python-dotenv"]
