@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights — AI Exposure to the Canadian Job Market</title>
+    <link rel="stylesheet" href="insights.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">&larr; Back to Map</a>
+        <h1>Key Insights</h1>
+        <div class="header-sub">AI Exposure to the Canadian Job Market</div>
+    </header>
+    <main>
+        <!-- 1. Hero Stats -->
+        <section class="hero-row" id="hero"></section>
+
+        <!-- 2. Sector Heatmap -->
+        <section class="section">
+            <h2>Exposure by Sector</h2>
+            <p class="section-sub">Average AI exposure score by NOC broad occupational category, weighted by employment.</p>
+            <div id="sector-chart"></div>
+        </section>
+
+        <!-- 3. Pay Paradox -->
+        <section class="section">
+            <h2>The Pay Paradox</h2>
+            <p class="section-sub">Higher-paid workers face greater AI exposure. Average score by wage bracket.</p>
+            <div id="pay-chart"></div>
+        </section>
+
+        <!-- 4. Education Gap -->
+        <section class="section">
+            <h2>Exposure by Education</h2>
+            <p class="section-sub">AI exposure by TEER (Training, Education, Experience, Responsibility) level.</p>
+            <div id="edu-chart"></div>
+        </section>
+
+        <!-- 5. Timeline -->
+        <section class="section">
+            <h2>AI Impact Timeline</h2>
+            <p class="section-sub">When will AI impact hit? Based on Eloundou et al. LLM exposure tiers and COPS demand projections.</p>
+            <div class="timeline-row" id="timeline"></div>
+        </section>
+
+        <!-- 6. Double Jeopardy -->
+        <section class="section">
+            <h2>Double Jeopardy: Most At-Risk Occupations</h2>
+            <p class="section-sub">High AI exposure score AND shrinking labour demand. These jobs are most likely to contract first.</p>
+            <div id="jeopardy-table"></div>
+        </section>
+
+        <!-- 7. Safest Jobs -->
+        <section class="section">
+            <h2>Safest Jobs</h2>
+            <p class="section-sub">Low AI exposure AND strong labour demand. Physical work the economy needs more of.</p>
+            <div id="safe-table"></div>
+        </section>
+
+        <!-- 8. Top 15 by Wage Impact -->
+        <section class="section">
+            <h2>Top 15 Most Exposed by Wage Impact</h2>
+            <p class="section-sub">Occupations with the largest total payroll at high AI exposure (score &ge; 6), ranked by employment &times; median wage.</p>
+            <div id="top15-table"></div>
+        </section>
+
+        <footer>
+            <div>by Reuven Gorsht &middot; <a href="https://www.linkedin.com/in/rgorsht/" target="_blank">LinkedIn</a> &middot; <a href="https://x.com/reuvengorsht" target="_blank">X</a></div>
+            <div class="footer-sources">Data: NOC 2021 (StatCan), ESDC wages, COPS 2024-2033 projections, Eloundou et al. LLM exposure scores. AI scoring by Claude.</div>
+        </footer>
+    </main>
+
+    <script>
+    const fmt = d3.format("$,.0f");
+    const fmtB = v => v >= 1e12 ? "$"+(v/1e12).toFixed(1)+"T" : v >= 1e9 ? "$"+(v/1e9).toFixed(1)+"B" : "$"+(v/1e6).toFixed(0)+"M";
+    const fmtM = v => v >= 1e6 ? (v/1e6).toFixed(1)+"M" : v >= 1e3 ? (v/1e3).toFixed(0)+"K" : v.toString();
+    const fmtPct = v => (v*100).toFixed(0) + "%";
+
+    const colorScale = d3.scaleSequential()
+        .domain([0, 10])
+        .interpolator(d3.interpolateRgbBasis(["#2d7d46","#7ab648","#c4d84a","#f0c93a","#e8842a","#d9381e"]));
+
+    const teerLabels = {1:"University degree",2:"College/apprentice 2yr+",3:"College/apprentice <2yr",4:"High school",5:"No formal education"};
+    const payBuckets = [{l:"<$35K",lo:0,hi:35000},{l:"$35\u201350K",lo:35000,hi:50000},{l:"$50\u201375K",lo:50000,hi:75000},{l:"$75\u2013100K",lo:75000,hi:100000},{l:"$100K+",lo:100000,hi:Infinity}];
+    const tlLabels = {"0-2yr":"0\u20132 Years","2-3yr":"2\u20133 Years","3+yr":"3+ Years"};
+
+    function makeBarChart(container, rows, maxScore) {
+        const el = document.getElementById(container);
+        rows.forEach(r => {
+            const div = document.createElement("div");
+            div.className = "hbar-row";
+            div.innerHTML = `
+                <span class="hbar-label">${r.label}</span>
+                <div class="hbar-track">
+                    <div class="hbar-fill" style="width:${r.score/maxScore*100}%;background:${colorScale(r.score)}"></div>
+                </div>
+                <span class="hbar-score" style="color:${colorScale(r.score)}">${r.score.toFixed(1)}</span>
+                <span class="hbar-meta">${r.meta}</span>`;
+            el.appendChild(div);
+        });
+    }
+
+    function makeTable(container, headers, rows) {
+        const el = document.getElementById(container);
+        let html = '<table><thead><tr>';
+        headers.forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
+        rows.forEach(r => {
+            html += '<tr>';
+            r.forEach((c, i) => {
+                const cls = i === 0 ? '' : ' class="num"';
+                html += `<td${cls}>${c}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        el.innerHTML = html;
+    }
+
+    d3.json("data.json").then(data => {
+        const v = data.filter(d => d.employment && d.wage_median);
+        const totalPayroll = d3.sum(v, d => d.employment * d.wage_median);
+        const totalWorkers = d3.sum(v, d => d.employment);
+
+        const highExp = v.filter(d => d.ai_score >= 6);
+        const highWorkers = d3.sum(highExp, d => d.employment);
+        const highPayroll = d3.sum(highExp, d => d.employment * d.wage_median);
+        const weightedAvg = d3.sum(v, d => d.employment * d.ai_score) / totalWorkers;
+
+        // 1. Hero stats
+        document.getElementById("hero").innerHTML = `
+            <div class="hero-card">
+                <div class="hero-value stat-red">${fmtB(highPayroll)}</div>
+                <div class="hero-label">wages exposed</div>
+                <div class="hero-sub">${(highPayroll/totalPayroll*100).toFixed(0)}% of total Canadian payroll</div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-value">${fmtM(highWorkers)}</div>
+                <div class="hero-label">workers in high-exposure jobs</div>
+                <div class="hero-sub">${(highWorkers/totalWorkers*100).toFixed(0)}% of workforce &middot; score &ge; 6</div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-value" style="color:${colorScale(weightedAvg)}">${weightedAvg.toFixed(1)}</div>
+                <div class="hero-label">weighted avg. exposure</div>
+                <div class="hero-sub">job-weighted, 0&ndash;10 scale</div>
+            </div>`;
+
+        // 2. Sector heatmap
+        const byCat = d3.groups(v, d => d.broad_category_name).map(([name, items]) => {
+            const w = d3.sum(items, d => d.employment);
+            const avg = d3.sum(items, d => d.employment * d.ai_score) / w;
+            const highPct = d3.sum(items.filter(d => d.ai_score >= 6), d => d.employment) / w;
+            return {label: name, score: avg, meta: `${fmtM(w)} workers \u00b7 ${(highPct*100).toFixed(0)}% high-exposure`};
+        }).sort((a, b) => b.score - a.score);
+        makeBarChart("sector-chart", byCat, 10);
+
+        // 3. Pay paradox
+        const payRows = payBuckets.map(b => {
+            const items = v.filter(d => d.wage_median >= b.lo && d.wage_median < b.hi);
+            const w = d3.sum(items, d => d.employment);
+            const avg = w > 0 ? d3.sum(items, d => d.employment * d.ai_score) / w : 0;
+            return {label: b.l, score: avg, meta: `${fmtM(w)} workers`};
+        });
+        makeBarChart("pay-chart", payRows, 10);
+
+        // 4. Education gap
+        const eduRows = [1,2,3,4,5].map(t => {
+            const items = v.filter(d => d.teer === t);
+            const w = d3.sum(items, d => d.employment);
+            const avg = w > 0 ? d3.sum(items, d => d.employment * d.ai_score) / w : 0;
+            const highPct = w > 0 ? d3.sum(items.filter(d => d.ai_score >= 6), d => d.employment) / w : 0;
+            return {label: teerLabels[t], score: avg, meta: `${fmtM(w)} workers \u00b7 ${(highPct*100).toFixed(0)}% high-exposure`};
+        });
+        makeBarChart("edu-chart", eduRows, 10);
+
+        // 5. Timeline
+        const tlEl = document.getElementById("timeline");
+        ["0-2yr","2-3yr","3+yr"].forEach(tl => {
+            const items = v.filter(d => d.timeline === tl);
+            const w = d3.sum(items, d => d.employment);
+            const high = items.filter(d => d.ai_score >= 6);
+            const hw = d3.sum(high, d => d.employment);
+            const hp = d3.sum(high, d => d.employment * d.wage_median);
+            const avg = w > 0 ? d3.sum(items, d => d.employment * d.ai_score) / w : 0;
+            const top3 = items.sort((a, b) => (b.employment || 0) * b.ai_score - (a.employment || 0) * a.ai_score).slice(0, 3);
+
+            const card = document.createElement("div");
+            card.className = "tl-card";
+            card.innerHTML = `
+                <div class="tl-header">${tlLabels[tl]}</div>
+                <div class="tl-stat">${fmtM(w)} <span>workers</span></div>
+                <div class="tl-stat">${fmtM(hw)} <span>high-exposure</span></div>
+                <div class="tl-stat">${fmtB(hp)} <span>wages at risk</span></div>
+                <div class="tl-stat">avg <span style="color:${colorScale(avg)}">${avg.toFixed(1)}/10</span></div>
+                <div class="tl-top">Top occupations:</div>
+                ${top3.map(d => `<div class="tl-occ">${d.title} <span>${d.ai_score}/10</span></div>`).join("")}`;
+            tlEl.appendChild(card);
+        });
+
+        // 6. Double jeopardy
+        const jeopardy = v
+            .filter(d => d.ai_score >= 6 && (d.outlook === "Strong risk of Surplus" || d.outlook === "Moderate risk of Surplus"))
+            .sort((a, b) => (b.employment * b.wage_median) - (a.employment * a.wage_median));
+        makeTable("jeopardy-table",
+            ["Occupation", "Score", "Demand Outlook", "Workers", "Payroll"],
+            jeopardy.map(d => [
+                d.title,
+                d.ai_score + "/10",
+                d.outlook,
+                fmtM(d.employment),
+                fmtB(d.employment * d.wage_median)
+            ])
+        );
+
+        // 7. Safest jobs
+        const safe = v
+            .filter(d => d.ai_score <= 3 && (d.outlook === "Strong risk of Shortage" || d.outlook === "Moderate risk of Shortage"))
+            .sort((a, b) => b.employment - a.employment)
+            .slice(0, 10);
+        makeTable("safe-table",
+            ["Occupation", "Score", "Demand Outlook", "Workers"],
+            safe.map(d => [d.title, d.ai_score + "/10", d.outlook, fmtM(d.employment)])
+        );
+
+        // 8. Top 15 by wage impact
+        const top15 = v
+            .filter(d => d.ai_score >= 6)
+            .sort((a, b) => (b.employment * b.wage_median) - (a.employment * a.wage_median))
+            .slice(0, 15);
+        makeTable("top15-table",
+            ["Occupation", "Score", "Workers", "Median Wage", "Total Payroll"],
+            top15.map(d => [
+                d.title,
+                d.ai_score + "/10",
+                fmtM(d.employment),
+                fmt(d.wage_median),
+                fmtB(d.employment * d.wage_median)
+            ])
+        );
+    });
+    </script>
+</body>
+</html>
