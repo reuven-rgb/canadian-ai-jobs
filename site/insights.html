@@ -125,7 +125,7 @@
 
     const colorScale = d3.scaleSequential()
         .domain([0, 10])
-        .interpolator(d3.interpolateRgbBasis(["#2d7d46","#7ab648","#c4d84a","#f0c93a","#e8842a","#d9381e"]));
+        .interpolator(d3.interpolateRgbBasis(["#2d7d46","#7ab648","#c4d84a","#f0c93a","#e8842a","#d9381e","#b91c1c","#991b1b"]));
 
     const teerLabels = {1:"University degree",2:"College/apprentice 2yr+",3:"College/apprentice <2yr",4:"High school",5:"No formal education"};
     const payBuckets = [{l:"<$35K",lo:0,hi:35000},{l:"$35\u201350K",lo:35000,hi:50000},{l:"$50\u201375K",lo:50000,hi:75000},{l:"$75\u2013100K",lo:75000,hi:100000},{l:"$100K+",lo:100000,hi:Infinity}];

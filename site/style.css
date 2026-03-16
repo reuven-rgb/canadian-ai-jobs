@@ -123,7 +123,7 @@ h1 {
     width: 80px;
     height: 8px;
     border-radius: 3px;
-    background: linear-gradient(to right, #2d7d46, #7ab648, #c4d84a, #f0c93a, #e8842a, #d9381e);
+    background: linear-gradient(to right, #2d7d46, #7ab648, #c4d84a, #f0c93a, #e8842a, #d9381e, #b91c1c, #991b1b);
 }
 .legend-label { white-space: nowrap; }
 
