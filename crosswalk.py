@@ -84,7 +84,25 @@ def main() -> None:
     result["beta"] = ((result["dv_rating_beta"] + result["human_rating_beta"]) / 2).round(4)
     result["gamma"] = ((result["dv_rating_gamma"] + result["human_rating_gamma"]) / 2).round(4)
 
-    output = result[["noc_code", "alpha", "beta", "gamma"]].sort_values("noc_code")
+    # Keep individual human and AI ratings for disagreement analysis
+    result["human_alpha"] = result["human_rating_alpha"].round(4)
+    result["human_beta"] = result["human_rating_beta"].round(4)
+    result["human_gamma"] = result["human_rating_gamma"].round(4)
+    result["ai_alpha"] = result["dv_rating_alpha"].round(4)
+    result["ai_beta"] = result["dv_rating_beta"].round(4)
+    result["ai_gamma"] = result["dv_rating_gamma"].round(4)
+
+    # Max disagreement across all three tiers
+    result["disagreement"] = result.apply(lambda r: max(
+        abs(r["human_alpha"] - r["ai_alpha"]),
+        abs(r["human_beta"] - r["ai_beta"]),
+        abs(r["human_gamma"] - r["ai_gamma"]),
+    ), axis=1).round(4)
+
+    output = result[["noc_code", "alpha", "beta", "gamma",
+                      "human_alpha", "human_beta", "human_gamma",
+                      "ai_alpha", "ai_beta", "ai_gamma",
+                      "disagreement"]].sort_values("noc_code")
 
     out_path = DATA_DIR / "eloundou_noc2021.csv"
     output.to_csv(out_path, index=False)

@@ -66,8 +66,53 @@
             <div id="top15-table"></div>
         </section>
 
+        <!-- 9. Supply-Demand-AI Triangle -->
+        <section class="section">
+            <h2>Supply-Demand-AI Triangle</h2>
+            <p class="section-sub">Each bubble is an occupation. X-axis = labour supply/demand ratio (>1 = surplus). Y-axis = AI exposure score. Size = employment. Red quadrant = high exposure + surplus = maximum risk.</p>
+            <div id="scatter-chart"></div>
+        </section>
+
+        <!-- 10. Immigration at Risk -->
+        <section class="section">
+            <h2>Immigration at Risk</h2>
+            <p class="section-sub">Occupations with highest immigration share of job seekers, colored by AI exposure. If AI displaces these roles, immigration pipelines are disrupted.</p>
+            <div id="immigration-chart"></div>
+            <div id="immigration-callout" class="callout"></div>
+        </section>
+
+        <!-- 11. Growth Trajectories -->
+        <section class="section">
+            <h2>Growth Trajectories (2024&ndash;2033)</h2>
+            <p class="section-sub">Projected employment growth for the most and least AI-exposed occupations. Declining lines = shrinking demand.</p>
+            <div class="trajectory-grid" id="trajectories"></div>
+        </section>
+
+        <!-- 12. Expert Disagreement -->
+        <section class="section">
+            <h2>Expert Disagreement</h2>
+            <p class="section-sub">Occupations where human experts and GPT-4 most disagree on AI exposure (Eloundou et al.). High disagreement = uncertain impact.</p>
+            <div id="disagreement-table"></div>
+        </section>
+
+        <!-- 13. Human Moats vs AI Moat -->
+        <section class="section">
+            <h2>Human Moats vs AI Moat</h2>
+            <p class="section-sub">Themes extracted from 516 AI scoring rationales. Left: factors that protect jobs from AI. Right: factors that make jobs vulnerable.</p>
+            <div class="moat-grid">
+                <div class="moat-col">
+                    <div class="moat-header moat-safe">Human Moats</div>
+                    <div id="moat-left"></div>
+                </div>
+                <div class="moat-col">
+                    <div class="moat-header moat-risk">AI Moat</div>
+                    <div id="moat-right"></div>
+                </div>
+            </div>
+        </section>
+
         <footer>
-            <div>by Reuven Gorsht &middot; <a href="https://www.linkedin.com/in/rgorsht/" target="_blank">LinkedIn</a> &middot; <a href="https://x.com/reuvengorsht" target="_blank">X</a></div>
+            <div>by Reuven Gorsht &middot; <a href="https://www.linkedin.com/in/rgorsht/" target="_blank">LinkedIn</a> &middot; <a href="https://reuvengorsht.substack.com/" target="_blank">Substack</a> &middot; <a href="https://x.com/reuvengorsht" target="_blank">X</a></div>
             <div class="footer-sources">Data: NOC 2021 (StatCan), ESDC wages, COPS 2024-2033 projections, Eloundou et al. LLM exposure scores. AI scoring by Claude.</div>
         </footer>
     </main>
@@ -239,6 +284,157 @@
                 fmtB(d.employment * d.wage_median)
             ])
         );
+
+        // 9. Supply-Demand-AI Scatter
+        const scatterData = v.filter(d => d.supply_demand_ratio && d.supply_demand_ratio > 0 && d.supply_demand_ratio < 3);
+        const scW = 900, scH = 500, margin = {top: 20, right: 20, bottom: 40, left: 50};
+        const scSvg = d3.select("#scatter-chart").append("svg").attr("width", scW).attr("height", scH);
+        const xSc = d3.scaleLinear().domain([0.3, 2.0]).range([margin.left, scW - margin.right]);
+        const ySc = d3.scaleLinear().domain([0, 10]).range([scH - margin.bottom, margin.top]);
+        const rSc = d3.scaleSqrt().domain([0, d3.max(scatterData, d => d.employment)]).range([2, 30]);
+
+        // Quadrant backgrounds
+        scSvg.append("rect").attr("x", xSc(1)).attr("y", margin.top).attr("width", scW-margin.right-xSc(1)).attr("height", ySc(6)-margin.top).attr("fill", "rgba(217,56,30,0.08)");
+        scSvg.append("text").attr("x", xSc(1.5)).attr("y", ySc(8.5)).attr("text-anchor","middle").attr("fill","#d9381e").attr("font-size",11).attr("opacity",0.6).text("HIGH RISK");
+        scSvg.append("rect").attr("x", margin.left).attr("y", ySc(6)).attr("width", xSc(1)-margin.left).attr("height", scH-margin.bottom-ySc(6)).attr("fill", "rgba(45,125,70,0.08)");
+        scSvg.append("text").attr("x", xSc(0.65)).attr("y", ySc(1.5)).attr("text-anchor","middle").attr("fill","#2d7d46").attr("font-size",11).attr("opacity",0.6).text("SAFE");
+
+        // Axes
+        scSvg.append("g").attr("transform",`translate(0,${scH-margin.bottom})`).call(d3.axisBottom(xSc).ticks(6).tickFormat(d => d.toFixed(1))).selectAll("text").attr("fill","#888");
+        scSvg.append("g").attr("transform",`translate(${margin.left},0)`).call(d3.axisLeft(ySc).ticks(5)).selectAll("text").attr("fill","#888");
+        scSvg.selectAll(".domain,.tick line").attr("stroke","#333");
+        scSvg.append("text").attr("x",scW/2).attr("y",scH-4).attr("text-anchor","middle").attr("fill","#888").attr("font-size",11).text("Supply/Demand Ratio (\u2192 surplus)");
+        scSvg.append("text").attr("transform","rotate(-90)").attr("x",-scH/2).attr("y",14).attr("text-anchor","middle").attr("fill","#888").attr("font-size",11).text("AI Exposure Score");
+        // Reference line at ratio=1
+        scSvg.append("line").attr("x1",xSc(1)).attr("x2",xSc(1)).attr("y1",margin.top).attr("y2",scH-margin.bottom).attr("stroke","#555").attr("stroke-dasharray","4,4");
+
+        const scTooltip = d3.select("#scatter-chart").append("div").attr("class","scatter-tip").style("display","none");
+        scSvg.selectAll("circle").data(scatterData).join("circle")
+            .attr("cx", d => xSc(Math.min(d.supply_demand_ratio, 2.0)))
+            .attr("cy", d => ySc(d.ai_score))
+            .attr("r", d => rSc(d.employment))
+            .attr("fill", d => colorScale(d.ai_score))
+            .attr("opacity", 0.7)
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5)
+            .on("mouseover", (event, d) => {
+                scTooltip.style("display","block").html(`<strong>${d.title}</strong><br>Score: ${d.ai_score}/10 \u00b7 S/D: ${d.supply_demand_ratio.toFixed(2)} \u00b7 ${fmtM(d.employment)} workers`);
+            })
+            .on("mousemove", (event) => {
+                scTooltip.style("left",(event.offsetX+15)+"px").style("top",(event.offsetY-10)+"px");
+            })
+            .on("mouseout", () => scTooltip.style("display","none"));
+
+        // 10. Immigration at risk
+        const withImm = v.filter(d => d.immigration_share && d.immigration_share > 0 && d.immigration)
+            .sort((a, b) => b.immigration_share - a.immigration_share).slice(0, 15);
+        makeBarChart("immigration-chart", withImm.map(d => ({
+            label: d.title.length > 35 ? d.title.slice(0,32) + "\u2026" : d.title,
+            score: d.ai_score,
+            meta: `${(d.immigration_share * 100).toFixed(0)}% immigration \u00b7 ${fmtM(d.immigration)} immigrants`
+        })), 10);
+        const immHighExp = v.filter(d => d.ai_score >= 6 && d.immigration);
+        const immTotal = d3.sum(immHighExp, d => d.immigration);
+        document.getElementById("immigration-callout").innerHTML =
+            `<strong>${fmtM(immTotal)}</strong> immigrant workers are in high-exposure (score \u2265 6) occupations.`;
+
+        // 11. Growth trajectories
+        const years = [2024,2025,2026,2027,2028,2029,2030,2031,2032,2033];
+        const withGrowth = data.filter(d => d.growth_by_year && d.employment);
+        const declining = withGrowth.filter(d => d.ai_score >= 6)
+            .sort((a, b) => d3.sum(a.growth_by_year) - d3.sum(b.growth_by_year)).slice(0, 6);
+        const growing = withGrowth.filter(d => d.ai_score <= 3)
+            .sort((a, b) => d3.sum(b.growth_by_year) - d3.sum(a.growth_by_year)).slice(0, 6);
+        const trajData = [...declining, ...growing];
+
+        const trajEl = document.getElementById("trajectories");
+        trajData.forEach(d => {
+            const card = document.createElement("div");
+            card.className = "traj-card";
+            const vals = d.growth_by_year;
+            const maxV = Math.max(...vals.map(Math.abs), 1);
+            const sw = 180, sh = 60;
+            const xT = d3.scaleLinear().domain([0, 9]).range([0, sw]);
+            const yT = d3.scaleLinear().domain([-maxV, maxV]).range([sh, 0]);
+            const line = d3.line().x((v,i) => xT(i)).y(v => yT(v));
+            const color = colorScale(d.ai_score);
+
+            card.innerHTML = `
+                <div class="traj-title">${d.title}</div>
+                <div class="traj-meta">Score: ${d.ai_score}/10 \u00b7 ${fmtM(d.employment)} workers</div>
+                <svg width="${sw}" height="${sh}">
+                    <line x1="0" y1="${yT(0)}" x2="${sw}" y2="${yT(0)}" stroke="#333" stroke-dasharray="2,2"/>
+                    <path d="${line(vals)}" fill="none" stroke="${color}" stroke-width="2"/>
+                </svg>
+                <div class="traj-years"><span>2024</span><span>2033</span></div>`;
+            trajEl.appendChild(card);
+        });
+
+        // 12. Expert disagreement
+        const withDisagree = data.filter(d => d.disagreement != null)
+            .sort((a, b) => b.disagreement - a.disagreement).slice(0, 15);
+        makeTable("disagreement-table",
+            ["Occupation", "Score", "Human \u03b1", "AI \u03b1", "Max Disagreement"],
+            withDisagree.map(d => [
+                d.title,
+                d.ai_score + "/10",
+                d.human_alpha != null ? d.human_alpha.toFixed(2) : "?",
+                d.ai_alpha != null ? d.ai_alpha.toFixed(2) : "?",
+                d.disagreement.toFixed(2)
+            ])
+        );
+
+        // 13. Human Moats vs AI Moat
+        const moatThemes = {
+            physical_presence: { label: "Physical Presence", side: "moat" },
+            outdoor_environment: { label: "Outdoor/Unpredictable", side: "moat" },
+            safety_critical: { label: "Safety Critical", side: "moat" },
+            creative_judgment: { label: "Creative Judgment", side: "moat" },
+            client_relationship: { label: "Client Relationships", side: "moat" },
+            regulatory_trust: { label: "Regulatory/Trust", side: "moat" },
+            digital_data: { label: "Digital/Data Work", side: "risk" },
+            content_generation: { label: "Content Generation", side: "risk" },
+            routine_cognitive: { label: "Routine Cognitive", side: "risk" },
+            complex_analysis: { label: "Complex Analysis", side: "risk" },
+        };
+        const themeCounts = {};
+        data.forEach(d => {
+            (d.themes || []).forEach(t => { themeCounts[t] = (themeCounts[t] || 0) + 1; });
+        });
+
+        function buildMoatSide(containerId, keys) {
+            const el = document.getElementById(containerId);
+            const maxCount = Math.max(...Object.values(themeCounts));
+            keys.forEach(key => {
+                const info = moatThemes[key];
+                const count = themeCounts[key] || 0;
+                const withTheme = data.filter(d => d.themes && d.themes.includes(key) && d.employment);
+                const tw = d3.sum(withTheme, d => d.employment);
+                const avg = tw > 0 ? d3.sum(withTheme, d => d.employment * d.ai_score) / tw : 0;
+                const barColor = info.side === "moat" ? "#2d7d46" : colorScale(avg);
+
+                const row = document.createElement("div");
+                row.className = "moat-row";
+                row.innerHTML = `
+                    <div class="moat-label">${info.label}</div>
+                    <div class="moat-bar-wrap">
+                        <div class="moat-bar" style="width:${count/maxCount*100}%;background:${barColor}"></div>
+                    </div>
+                    <div class="moat-stats">
+                        <span class="moat-count">${count} jobs</span>
+                        <span class="moat-score" style="color:${colorScale(avg)}">avg score ${avg.toFixed(1)}</span>
+                    </div>`;
+                el.appendChild(row);
+            });
+        }
+
+        const moatKeys = Object.entries(moatThemes).filter(([,v]) => v.side === "moat").map(([k]) => k);
+        const riskKeys = Object.entries(moatThemes).filter(([,v]) => v.side === "risk").map(([k]) => k);
+        // Sort each side by count descending
+        moatKeys.sort((a, b) => (themeCounts[b]||0) - (themeCounts[a]||0));
+        riskKeys.sort((a, b) => (themeCounts[b]||0) - (themeCounts[a]||0));
+        buildMoatSide("moat-left", moatKeys);
+        buildMoatSide("moat-right", riskKeys);
     });
     </script>
 </body>

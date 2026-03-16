@@ -89,20 +89,42 @@ def load_cops() -> pd.DataFrame:
     cond = cond.rename(columns={"Future_Labour_Market_Conditions": "outlook"})
     cond = cond[["noc_code", "outlook"]]
 
-    # Employment counts from COPS summary
+    # Employment counts + supply/demand from COPS summary
     summary = pd.read_csv(DATA_DIR / "cops_summary.csv", encoding="latin-1")
     summary = summary[summary["Code"].str.match(r"^\d{5}$", na=False)].copy()
     summary["noc_code"] = summary["Code"].str.zfill(5)
-    summary = summary.rename(columns={"Employment_emploi_2023": "employment"})
-    summary = summary[["noc_code", "employment"]]
+    summary = summary.rename(columns={
+        "Employment_emploi_2023": "employment",
+        "Total_Job_Openings_Perspective_d'emploi": "job_openings",
+        "Job_Seekers_Chercheurs_emploi": "job_seekers_raw",
+        "Immigration": "immigration",
+        "School_Leavers_Sortants_scolaires": "school_leavers",
+        "Retirements_retraites": "retirements",
+    })
+    # job_seekers may have commas in the number
+    summary["job_seekers"] = pd.to_numeric(
+        summary["job_seekers_raw"].astype(str).str.replace(",", ""), errors="coerce"
+    )
+    # Supply/demand ratio (seekers per opening, >1 = surplus, <1 = shortage)
+    summary["supply_demand_ratio"] = (summary["job_seekers"] / summary["job_openings"]).round(3)
+    # Immigration share of total seekers
+    summary["immigration_share"] = (summary["immigration"] / summary["job_seekers"]).round(3)
 
-    # Employment growth — compute average annual growth 2024-2033
+    summary = summary[["noc_code", "employment", "job_openings", "job_seekers",
+                        "immigration", "school_leavers", "retirements",
+                        "supply_demand_ratio", "immigration_share"]]
+
+    # Employment growth — year-by-year + average
     growth = pd.read_csv(DATA_DIR / "cops_employment_growth.csv", encoding="latin-1")
     growth = growth[growth["Code"].str.match(r"^\d{5}$", na=False)].copy()
     growth["noc_code"] = growth["Code"].str.zfill(5)
     year_cols = [str(y) for y in range(2024, 2034)]
     growth["growth_trend"] = growth[year_cols].mean(axis=1).round(0)
-    growth = growth[["noc_code", "growth_trend"]]
+    # Store year-by-year as a JSON string for later use
+    growth["growth_by_year"] = growth[year_cols].apply(
+        lambda row: [int(v) if pd.notna(v) else 0 for v in row], axis=1
+    ).apply(str)
+    growth = growth[["noc_code", "growth_trend", "growth_by_year"]]
 
     return cond.merge(summary, on="noc_code", how="outer").merge(growth, on="noc_code", how="outer")
 

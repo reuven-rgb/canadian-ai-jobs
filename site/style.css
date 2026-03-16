@@ -155,17 +155,23 @@ h1 {
 .insights-link {
     display: block;
     text-align: center;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    background: #2d7d46;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #d9381e, #e8842a);
     color: #fff;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.15s;
+    border-radius: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(217, 56, 30, 0.3);
+    letter-spacing: 0.02em;
 }
-.insights-link:hover { background: #359952; }
+.insights-link:hover {
+    background: linear-gradient(135deg, #e8842a, #f0c93a);
+    box-shadow: 0 4px 16px rgba(217, 56, 30, 0.5);
+    transform: translateY(-1px);
+}
 
 .sidebar-footer {
     margin-top: auto;

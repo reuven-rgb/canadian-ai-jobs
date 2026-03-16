@@ -223,6 +223,159 @@ tbody td {
 
 tbody tr:hover { background: #1e2d4d; }
 
+/* Scatter plot */
+#scatter-chart {
+    position: relative;
+}
+
+#scatter-chart svg {
+    display: block;
+}
+
+.scatter-tip {
+    position: absolute;
+    background: rgba(22,33,62,0.95);
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #e0e0e0;
+    pointer-events: none;
+    z-index: 10;
+    max-width: 350px;
+    line-height: 1.4;
+}
+
+/* Callout */
+.callout {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #1e2d4d;
+    border-left: 3px solid #d9381e;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #ccc;
+}
+
+/* Growth trajectory grid */
+.trajectory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.traj-card {
+    background: #16213e;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #2a3555;
+}
+
+.traj-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.traj-meta {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.traj-years {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Moat vs Frontlines */
+.moat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.moat-col {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 16px 20px;
+    border: 1px solid #2a3555;
+}
+
+.moat-header {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid;
+}
+
+.moat-safe {
+    color: #2d7d46;
+    border-color: #2d7d46;
+}
+
+.moat-risk {
+    color: #e8842a;
+    border-color: #e8842a;
+}
+
+.moat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+}
+
+.moat-label {
+    width: 130px;
+    font-size: 12px;
+    color: #ccc;
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.moat-bar-wrap {
+    flex: 1;
+    height: 18px;
+    background: #0f1629;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.moat-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s;
+}
+
+.moat-stats {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.moat-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e0e0e0;
+}
+
+.moat-score {
+    font-size: 10px;
+    font-weight: 600;
+}
+
 /* Footer */
 footer {
     margin-top: 48px;
