@@ -8,6 +8,7 @@ from pathlib import Path
 OCCUPATIONS_CSV = Path("occupations.csv")
 SCORES_FILE = Path("scores.json")
 THEMES_FILE = Path("data/themes.json")
+SECTOR_FILE = Path("data/sectors.json")
 SITE_DATA = Path("site/data.json")
 
 
@@ -40,12 +41,19 @@ def main() -> None:
         themes = json.loads(THEMES_FILE.read_text())
         print(f"  {len(themes)} theme entries loaded")
 
+    # Load sector classifications
+    sectors = {}
+    if SECTOR_FILE.exists():
+        sectors = json.loads(SECTOR_FILE.read_text())
+        print(f"  {len(sectors)} sector classifications loaded")
+
     # Build data structure
     occupations = []
     for _, row in df.iterrows():
         noc = str(row["noc_code"]).zfill(5)
         score_data = scores.get(noc, {})
         theme_data = themes.get(noc, {})
+        sector_data = sectors.get(noc, {})
 
         # Parse growth_by_year from string repr of list
         growth_by_year = None
@@ -87,6 +95,10 @@ def main() -> None:
             "growth_by_year": growth_by_year,
             # New: themes
             "themes": theme_data.get("themes", []),
+            # New: sector
+            "sector": sector_data.get("sector", ""),
+            "public_pct": sector_data.get("public_pct"),
+            "private_pct": sector_data.get("private_pct"),
         }
         occupations.append(occ)
 

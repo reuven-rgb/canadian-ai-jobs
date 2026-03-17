@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 1200px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .inner {
+    position: relative; z-index: 1;
+    padding: 56px 72px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    margin-bottom: 28px;
+  }
+  .header h2 {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .header p {
+    font-size: 22px;
+    color: #64748b;
+  }
+
+  .legend {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .legend-dot {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+  }
+
+  .rows {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px 0;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+  }
+  .rank {
+    width: 56px;
+    font-size: 32px;
+    font-weight: 900;
+    color: #334155;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .info {
+    width: 340px;
+    flex-shrink: 0;
+    padding-right: 24px;
+  }
+  .info .title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #e2e8f0;
+    line-height: 1.2;
+  }
+  .info .workers {
+    font-size: 18px;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .bar-track {
+    flex: 1;
+    height: 64px;
+    background: rgba(255,255,255,0.025);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 14px;
+  }
+  .bar-fill.w1 { background: linear-gradient(90deg, #f59e0b, rgba(245,158,11,0.25)); }
+  .bar-fill.w2 { background: linear-gradient(90deg, #ef4444, rgba(239,68,68,0.25)); }
+  .bar-fill.w3 { background: linear-gradient(90deg, #8b5cf6, rgba(139,92,246,0.25)); }
+
+  .amount {
+    width: 120px;
+    text-align: right;
+    font-size: 32px;
+    font-weight: 900;
+    padding-left: 20px;
+    flex-shrink: 0;
+  }
+  .amount.w1 { color: #f59e0b; }
+  .amount.w2 { color: #ef4444; }
+  .amount.w3 { color: #8b5cf6; }
+
+  .series {
+    position: absolute;
+    top: 40px; right: 48px;
+    font-size: 16px;
+    color: #475569;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+  .source {
+    position: absolute;
+    bottom: 36px; left: 0; right: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #334155;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+
+  <div class="series">6 / 6</div>
+
+  <div class="inner">
+    <div class="header">
+      <h2>Biggest Potential<br>Payroll Exposures</h2>
+      <p>Top 5 occupations by annual payroll potentially at risk</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Wave 1 — Clerical</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Wave 2 — Finance / Legal</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Wave 3 — Tech</div>
+    </div>
+
+    <div class="rows">
+      <div class="row">
+        <div class="rank">1</div>
+        <div class="info">
+          <div class="title">IT Systems Specialists</div>
+          <div class="workers">229K workers</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill w3" style="width:100%"></div></div>
+        <div class="amount w3">$22.0B</div>
+      </div>
+
+      <div class="row">
+        <div class="rank">2</div>
+        <div class="info">
+          <div class="title">Auditors & Accountants</div>
+          <div class="workers">247K workers</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill w2" style="width:94.5%"></div></div>
+        <div class="amount w2">$20.8B</div>
+      </div>
+
+      <div class="row">
+        <div class="rank">3</div>
+        <div class="info">
+          <div class="title">Marketing & Advertising</div>
+          <div class="workers">234K workers</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill w2" style="width:78.6%"></div></div>
+        <div class="amount w2">$17.3B</div>
+      </div>
+
+      <div class="row">
+        <div class="rank">4</div>
+        <div class="info">
+          <div class="title">IT Managers</div>
+          <div class="workers">124K workers</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill w3" style="width:78.2%"></div></div>
+        <div class="amount w3">$17.2B</div>
+      </div>
+
+      <div class="row">
+        <div class="rank">5</div>
+        <div class="info">
+          <div class="title">Software Developers</div>
+          <div class="workers">156K workers</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill w3" style="width:70.9%"></div></div>
+        <div class="amount w3">$15.6B</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="source">Data: StatCan NOC 2021 · ESDC Wages 2025 · Census 2021 · 516 occupations scored</div>
+</body>
+</html>

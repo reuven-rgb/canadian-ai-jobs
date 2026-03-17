@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 1200px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.1;
+    background: #8b5cf6;
+    top: -200px; left: -100px;
+  }
+
+  .inner {
+    position: relative; z-index: 1;
+    padding: 56px 72px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wave-badge {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #8b5cf6;
+    background: rgba(139,92,246,0.1);
+    padding: 10px 24px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    width: fit-content;
+  }
+  h1 {
+    font-size: 76px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: #8b5cf6;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 28px;
+    color: #94a3b8;
+    font-weight: 400;
+    margin-bottom: 40px;
+    line-height: 1.4;
+    max-width: 800px;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 48px;
+  }
+  .stat-box {
+    background: rgba(139,92,246,0.06);
+    border: 1px solid rgba(139,92,246,0.15);
+    border-radius: 20px;
+    padding: 28px 36px;
+  }
+  .stat-box .val {
+    font-size: 56px;
+    font-weight: 900;
+    color: #8b5cf6;
+    line-height: 1;
+  }
+  .stat-box .lbl {
+    font-size: 16px;
+    color: #94a3b8;
+    margin-top: 6px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .jobs-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  .job-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .job-label {
+    width: 380px;
+    font-size: 22px;
+    color: #cbd5e1;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .job-bar-track {
+    flex: 1;
+    height: 40px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 16px;
+  }
+  .job-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, rgba(139,92,246,0.3));
+    border-radius: 10px;
+  }
+  .job-count {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 120px;
+    padding-left: 16px;
+  }
+  .job-count .num {
+    font-size: 24px;
+    font-weight: 900;
+    color: #8b5cf6;
+    line-height: 1;
+  }
+  .job-count .unit {
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+
+  .callout {
+    margin-top: auto;
+    margin-bottom: 40px;
+    padding: 20px 28px;
+    background: rgba(139,92,246,0.06);
+    border-left: 4px solid #8b5cf6;
+    border-radius: 0 14px 14px 0;
+    font-size: 22px;
+    color: #a78bfa;
+    font-weight: 600;
+  }
+
+  .series {
+    position: absolute;
+    top: 40px; right: 48px;
+    font-size: 16px;
+    color: #475569;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+  .source {
+    position: absolute;
+    bottom: 36px; left: 0; right: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #334155;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="series">4 / 6</div>
+
+  <div class="inner">
+    <!-- badge removed -->
+    <h1>Technology &<br>Knowledge Work</h1>
+    <div class="subtitle">Software, research, education, creative design — potentially impacted as AI tools mature.</div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="val">1.7M</div>
+        <div class="lbl">Employees Potentially Impacted</div>
+      </div>
+      <div class="stat-box">
+        <div class="val">$159B</div>
+        <div class="lbl">Annual Payroll at Risk</div>
+      </div>
+    </div>
+
+    <div class="jobs-title">Top Occupations by # of Employees</div>
+
+    <div class="job-row">
+      <div class="job-label">IT Systems Specialists</div>
+      <div class="job-bar-track"><div class="job-bar-fill" style="width:100%"></div></div>
+      <div class="job-count"><div class="num">229K</div><div class="unit">employees</div></div>
+    </div>
+    <div class="job-row">
+      <div class="job-label">Software Developers</div>
+      <div class="job-bar-track"><div class="job-bar-fill" style="width:68%"></div></div>
+      <div class="job-count"><div class="num">156K</div><div class="unit">employees</div></div>
+    </div>
+    <div class="job-row">
+      <div class="job-label">College Instructors</div>
+      <div class="job-bar-track"><div class="job-bar-fill" style="width:57%"></div></div>
+      <div class="job-count"><div class="num">131K</div><div class="unit">employees</div></div>
+    </div>
+    <div class="job-row">
+      <div class="job-label">Software Engineers</div>
+      <div class="job-bar-track"><div class="job-bar-fill" style="width:49%"></div></div>
+      <div class="job-count"><div class="num">113K</div><div class="unit">employees</div></div>
+    </div>
+    <div class="job-row">
+      <div class="job-label">Graphic Designers</div>
+      <div class="job-bar-track"><div class="job-bar-fill" style="width:41%"></div></div>
+      <div class="job-count"><div class="num">93K</div><div class="unit">employees</div></div>
+    </div>
+
+    <div class="callout">Highest potential per-worker impact — $93K avg salary</div>
+  </div>
+
+  <div class="source">Data: StatCan NOC 2021 · AI exposure score 7+ / 10</div>
+</body>
+</html>

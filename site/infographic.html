@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exposure to the Canadian Job Market — Infographic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0f1629;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            width: 700px;
+            background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #2a3555;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            padding: 36px 40px 28px;
+            text-align: center;
+            border-bottom: 1px solid #2a3555;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        /* Hero stats */
+        .hero {
+            display: flex;
+            padding: 24px 32px;
+            gap: 16px;
+            border-bottom: 1px solid #2a3555;
+        }
+
+        .hero-stat {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(15,22,41,0.5);
+            border-radius: 10px;
+        }
+
+        .hero-stat .value {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .hero-stat .label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .red { color: #d9381e; }
+        .amber { color: #f0c93a; }
+
+        /* Job lists */
+        .lists {
+            display: flex;
+            padding: 0;
+        }
+
+        .list-col {
+            flex: 1;
+            padding: 24px 28px;
+        }
+
+        .list-col:first-child {
+            border-right: 1px solid #2a3555;
+        }
+
+        .list-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+        }
+
+        .list-header.risk {
+            color: #d9381e;
+            border-color: #d9381e;
+        }
+
+        .list-header.safe {
+            color: #2d7d46;
+            border-color: #2d7d46;
+        }
+
+        .job-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42,53,85,0.5);
+        }
+
+        .job-row:last-child { border-bottom: none; }
+
+        .job-score {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .job-info { flex: 1; }
+
+        .job-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+            line-height: 1.2;
+        }
+
+        .job-meta {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Bottom bar */
+        .bottom {
+            padding: 16px 32px;
+            border-top: 1px solid #2a3555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom .source {
+            font-size: 9px;
+            color: #555;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        .bottom .author {
+            font-size: 11px;
+            color: #999;
+            text-align: right;
+        }
+
+        .bottom .author a {
+            color: #7ab648;
+            text-decoration: none;
+        }
+
+        /* Color scale helper */
+        .score-0  { background: #2d7d46; }
+        .score-1  { background: #4a8e3e; }
+        .score-2  { background: #7ab648; }
+        .score-3  { background: #a3c94a; }
+        .score-4  { background: #c4d84a; }
+        .score-5  { background: #d8c93a; }
+        .score-6  { background: #e8a82a; }
+        .score-7  { background: #e8842a; }
+        .score-8  { background: #d9501e; }
+        .score-9  { background: #b91c1c; }
+        .score-10 { background: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>AI Exposure to the<br>Canadian Job Market</h1>
+            <div class="subtitle">516 occupations scored by AI/LLM exposure potential (0-10 scale)</div>
+        </div>
+
+        <div class="hero">
+            <div class="hero-stat">
+                <div class="value red">$646.7B</div>
+                <div class="label">Wages Exposed</div>
+            </div>
+            <div class="hero-stat">
+                <div class="value" style="color:#e0e0e0">7.9M</div>
+                <div class="label">Workers Impacted (39%)</div>
+            </div>
+            <div class="hero-stat">
+                <div class="value red">47%</div>
+                <div class="label">of Canadian Payroll</div>
+            </div>
+        </div>
+
+        <div class="lists">
+            <div class="list-col">
+                <div class="list-header risk">Most Exposed</div>
+
+                <div class="job-row">
+                    <div class="job-score score-9">9</div>
+                    <div class="job-info">
+                        <div class="job-title">Data Scientists</div>
+                        <div class="job-meta">36,600 workers · $95,992 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-9">9</div>
+                    <div class="job-info">
+                        <div class="job-title">Editors</div>
+                        <div class="job-meta">14,000 workers · $72,010 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-9">9</div>
+                    <div class="job-info">
+                        <div class="job-title">Data Entry Clerks</div>
+                        <div class="job-meta">36,000 workers · $48,880 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-8">8</div>
+                    <div class="job-info">
+                        <div class="job-title">Information Systems Specialists</div>
+                        <div class="job-meta">229,400 workers · $95,992 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-8">8</div>
+                    <div class="job-info">
+                        <div class="job-title">Graphic Designers & Illustrators</div>
+                        <div class="job-meta">93,200 workers · $65,000 median wage</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-col">
+                <div class="list-header safe">Least Exposed</div>
+
+                <div class="job-row">
+                    <div class="job-score score-0">0</div>
+                    <div class="job-info">
+                        <div class="job-title">Fishing Vessel Deckhands</div>
+                        <div class="job-meta">3,300 workers · $52,000 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-1">1</div>
+                    <div class="job-info">
+                        <div class="job-title">Public Works Labourers</div>
+                        <div class="job-meta">28,100 workers · $56,056 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-1">1</div>
+                    <div class="job-info">
+                        <div class="job-title">Plumbers</div>
+                        <div class="job-meta">59,900 workers · $70,720 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-1">1</div>
+                    <div class="job-info">
+                        <div class="job-title">Underground Miners</div>
+                        <div class="job-meta">29,400 workers · $87,360 median wage</div>
+                    </div>
+                </div>
+
+                <div class="job-row">
+                    <div class="job-score score-1">1</div>
+                    <div class="job-info">
+                        <div class="job-title">Fishermen/women</div>
+                        <div class="job-meta">10,600 workers · $57,762 median wage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="source">Data: NOC 2021 (StatCan), ESDC wages 2025, COPS 2024-2033 projections, Eloundou et al. LLM exposure scores. AI scoring by Claude Sonnet 4. "Exposed" = score ≥ 6 (primarily cognitive/knowledge work with significant AI augmentation potential).</div>
+            <div class="author">
+                by Reuven Gorsht<br>
+                <a href="https://www.linkedin.com/in/rgorsht/">LinkedIn</a> · <a href="https://reuvengorsht.substack.com/">Substack</a> · <a href="https://x.com/reuvengorsht">X</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

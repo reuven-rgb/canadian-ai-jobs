@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 1200px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .header {
+    position: absolute;
+    top: 48px; left: 72px;
+    z-index: 2;
+  }
+  .header h2 {
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1.15;
+  }
+  .header p {
+    font-size: 20px;
+    color: #64748b;
+    margin-top: 10px;
+  }
+
+  .legend {
+    position: absolute;
+    top: 210px; left: 72px;
+    display: flex;
+    gap: 28px;
+    z-index: 2;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .legend-dot {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+  }
+
+  .chart-area {
+    position: absolute;
+    top: 260px;
+    left: 48px;
+    right: 48px;
+    bottom: 70px;
+  }
+
+  .series {
+    position: absolute;
+    top: 40px; right: 48px;
+    font-size: 16px;
+    color: #475569;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+  .source {
+    position: absolute;
+    bottom: 28px; left: 0; right: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #334155;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+
+  <div class="series">5 / 6</div>
+
+  <div class="header">
+    <h2>$450B (47%) of Canadian<br>Payroll Has AI Exposure</h2>
+    <p>Cumulative impact by job class and horizon over the next 3 years</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Clerical & Admin</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Finance & Legal</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Tech & Knowledge</div>
+  </div>
+
+  <div class="chart-area">
+    <svg width="100%" height="100%" viewBox="0 0 1104 860" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="gw1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02"/>
+        </linearGradient>
+        <linearGradient id="gw2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#ef4444" stop-opacity="0.02"/>
+        </linearGradient>
+        <linearGradient id="gw3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Grid lines -->
+      <line x1="90" y1="40" x2="1060" y2="40" stroke="rgba(255,255,255,0.04)"/>
+      <line x1="90" y1="200" x2="1060" y2="200" stroke="rgba(255,255,255,0.04)"/>
+      <line x1="90" y1="360" x2="1060" y2="360" stroke="rgba(255,255,255,0.04)"/>
+      <line x1="90" y1="520" x2="1060" y2="520" stroke="rgba(255,255,255,0.04)"/>
+      <line x1="90" y1="680" x2="1060" y2="680" stroke="rgba(255,255,255,0.04)"/>
+      <!-- Baseline -->
+      <line x1="90" y1="760" x2="1060" y2="760" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+      <!-- Y axis labels -->
+      <text x="78" y="46" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$450B</text>
+      <text x="78" y="206" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$350B</text>
+      <text x="78" y="366" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$250B</text>
+      <text x="78" y="526" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$150B</text>
+      <text x="78" y="686" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$50B</text>
+      <text x="78" y="766" fill="#475569" font-size="20" font-family="Inter" text-anchor="end" font-weight="600">$0</text>
+
+      <!-- X axis: 5 time points spanning 90 to 1060 -->
+      <!-- 0:90  1:333  2:575  3:818  4:1060 -->
+      <text x="90" y="800" fill="#94a3b8" font-size="20" font-family="Inter" text-anchor="middle" font-weight="600">Now</text>
+      <text x="333" y="800" fill="#94a3b8" font-size="20" font-family="Inter" text-anchor="middle" font-weight="600">End 2026</text>
+      <text x="575" y="800" fill="#94a3b8" font-size="20" font-family="Inter" text-anchor="middle" font-weight="600">End 2027</text>
+      <text x="818" y="800" fill="#94a3b8" font-size="20" font-family="Inter" text-anchor="middle" font-weight="600">Mid 2028</text>
+      <text x="1060" y="800" fill="#94a3b8" font-size="20" font-family="Inter" text-anchor="middle" font-weight="600">End 2029</text>
+
+      <!-- Wave markers -->
+      <rect x="120" y="820" width="300" height="5" rx="2.5" fill="#f59e0b" opacity="0.5"/>
+      <rect x="320" y="820" width="380" height="5" rx="2.5" fill="#ef4444" opacity="0.5"/>
+      <rect x="680" y="820" width="380" height="5" rx="2.5" fill="#8b5cf6" opacity="0.5"/>
+      <text x="270" y="850" fill="#f59e0b" font-size="16" font-family="Inter" text-anchor="middle" font-weight="700" opacity="0.7">WAVE 1</text>
+      <text x="510" y="850" fill="#ef4444" font-size="16" font-family="Inter" text-anchor="middle" font-weight="700" opacity="0.7">WAVE 2</text>
+      <text x="870" y="850" fill="#8b5cf6" font-size="16" font-family="Inter" text-anchor="middle" font-weight="700" opacity="0.7">WAVE 3</text>
+
+      <!-- Data: y = 760 - (val/450)*720
+           Now:      total=0    y=760
+           End 2026: total=138  y=539
+           End 2027: total=336  y=223
+           Mid 2028: total=391  y=135
+           End 2029: total=450  y=40
+
+           w1 only:
+           Now:0 y=760   End2026:118 y=571   End2027:118 y=571  Mid2028:118 y=571  End2029:118 y=571
+
+           w1+w2:
+           Now:0 y=760   End2026:138 y=539   End2027:291 y=295  Mid2028:291 y=295  End2029:291 y=295
+      -->
+
+      <!-- Stacked area: total -->
+      <path d="M90,760 L333,539 L575,223 L818,135 L1060,40 L1060,760 Z" fill="url(#gw3)"/>
+      <!-- Stacked area: w1+w2 -->
+      <path d="M90,760 L333,539 L575,295 L818,295 L1060,295 L1060,760 Z" fill="url(#gw2)"/>
+      <!-- Area: w1 -->
+      <path d="M90,760 L333,571 L575,571 L818,571 L1060,571 L1060,760 Z" fill="url(#gw1)"/>
+
+      <!-- Lines -->
+      <path d="M90,760 L333,571 L575,571 L818,571 L1060,571" fill="none" stroke="#f59e0b" stroke-width="3.5"/>
+      <path d="M90,760 L333,539 L575,295 L818,295 L1060,295" fill="none" stroke="#ef4444" stroke-width="3.5"/>
+      <path d="M90,760 L333,539 L575,223 L818,135 L1060,40" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="10 7" opacity="0.5"/>
+
+      <!-- Milestone: End 2026 = $138B -->
+      <circle cx="333" cy="539" r="8" fill="#fff" stroke="#0a0e17" stroke-width="3"/>
+      <rect x="260" y="490" width="120" height="38" rx="10" fill="#1a2236" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="320" y="516" fill="#e2e8f0" font-size="22" font-family="Inter" text-anchor="middle" font-weight="800">$138B</text>
+
+      <!-- Milestone: End 2027 = $336B -->
+      <circle cx="575" cy="223" r="8" fill="#fff" stroke="#0a0e17" stroke-width="3"/>
+      <rect x="502" y="174" width="120" height="38" rx="10" fill="#1a2236" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="562" y="200" fill="#e2e8f0" font-size="22" font-family="Inter" text-anchor="middle" font-weight="800">$336B</text>
+
+      <!-- Milestone: End 2029 = $450B -->
+      <circle cx="1060" cy="40" r="10" fill="#ef4444" stroke="#0a0e17" stroke-width="3"/>
+      <rect x="950" y="52" width="120" height="42" rx="10" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.3)" stroke-width="1.5"/>
+      <text x="1010" y="80" fill="#f87171" font-size="24" font-family="Inter" text-anchor="middle" font-weight="900">$450B</text>
+    </svg>
+  </div>
+
+  <div class="source">Data: StatCan NOC 2021 · ESDC Wages 2025 · Census 2021</div>
+</body>
+</html>

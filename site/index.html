@@ -15,6 +15,13 @@
                 <input type="text" id="search" placeholder="Search occupations..." autocomplete="off">
                 <div id="search-results" class="search-results"></div>
             </div>
+            <div class="filter-group">
+                <span class="filter-label">Sector:</span>
+                <button class="filter-btn active" data-sector="all">All</button>
+                <button class="filter-btn" data-sector="public">Public</button>
+                <button class="filter-btn" data-sector="private">Private</button>
+                <button class="filter-btn" data-sector="mixed">Mixed</button>
+            </div>
             <div class="legend">
                 <span class="legend-label">Low</span>
                 <div class="legend-gradient"></div>
@@ -115,6 +122,7 @@
         let totalPayrollAll = 0;  // computed once from full dataset
         let totalJobsAll = 0;
         let activeTimeline = "all";
+        let activeSector = "all";
         let highlightedNoc = null;
 
         function buildTooltipHtml(dd) {
@@ -345,18 +353,22 @@
         }
 
         function updateView() {
-            const filtered = activeTimeline === "all"
-                ? allData
-                : allData.filter(d => d.timeline === activeTimeline);
+            let filtered = allData;
+            if (activeTimeline !== "all") {
+                filtered = filtered.filter(d => d.timeline === activeTimeline);
+            }
+            if (activeSector !== "all") {
+                filtered = filtered.filter(d => d.sector === activeSector);
+            }
             render(filtered);
         }
 
-        // Filter buttons
-        document.querySelectorAll(".filter-btn").forEach(btn => {
+        // Sector filter buttons
+        document.querySelectorAll("[data-sector]").forEach(btn => {
             btn.addEventListener("click", () => {
-                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll("[data-sector]").forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
-                activeTimeline = btn.dataset.timeline;
+                activeSector = btn.dataset.sector;
                 highlightedNoc = null;
                 updateView();
             });
@@ -384,8 +396,9 @@
                     highlightedNoc = d.noc;
                     searchInput.value = d.title;
                     searchResults.style.display = "none";
-                    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-                    document.querySelector('[data-timeline="all"]').classList.add("active");
+                    document.querySelectorAll("[data-sector]").forEach(b => b.classList.remove("active"));
+                    document.querySelector('[data-sector="all"]').classList.add("active");
+                    activeSector = "all";
                     activeTimeline = "all";
                     updateView();
                 });

@@ -66,7 +66,14 @@
             <div id="top15-table"></div>
         </section>
 
-        <!-- 9. Supply-Demand-AI Triangle -->
+        <!-- 9. Public vs Private Sector -->
+        <section class="section">
+            <h2>Public vs Private Sector</h2>
+            <p class="section-sub">AI exposure split by employment sector. Each occupation classified by Claude based on typical employer type in Canada.</p>
+            <div class="sector-grid" id="sector-split"></div>
+        </section>
+
+        <!-- 10. Supply-Demand-AI Triangle -->
         <section class="section">
             <h2>Supply-Demand-AI Triangle</h2>
             <p class="section-sub">Each bubble is an occupation. X-axis = labour supply/demand ratio (>1 = surplus). Y-axis = AI exposure score. Size = employment. Red quadrant = high exposure + surplus = maximum risk.</p>
@@ -285,7 +292,45 @@
             ])
         );
 
-        // 9. Supply-Demand-AI Scatter
+        // 9. Public vs Private Sector
+        const sectorEl = document.getElementById("sector-split");
+        const sectorLabels = {public: "Public Sector", private: "Private Sector", mixed: "Mixed (Both)"};
+        const sectorColors = {public: "#4a90d9", private: "#7ab648", mixed: "#f0c93a"};
+        ["public", "private", "mixed"].forEach(sec => {
+            const items = v.filter(d => d.sector === sec);
+            const sw = d3.sum(items, d => d.employment);
+            const sp = d3.sum(items, d => d.employment * d.wage_median);
+            const high = items.filter(d => d.ai_score >= 6);
+            const hw = d3.sum(high, d => d.employment);
+            const hp = d3.sum(high, d => d.employment * d.wage_median);
+            const avg = sw > 0 ? d3.sum(items, d => d.employment * d.ai_score) / sw : 0;
+            const pctExposed = sp > 0 ? (hp / sp * 100).toFixed(0) : 0;
+
+            const top3 = high.sort((a, b) => (b.employment * b.wage_median) - (a.employment * a.wage_median)).slice(0, 3);
+
+            const card = document.createElement("div");
+            card.className = "sector-card";
+            card.innerHTML = `
+                <div class="sector-header" style="border-color:${sectorColors[sec]};color:${sectorColors[sec]}">${sectorLabels[sec]}</div>
+                <div class="sector-stat-row">
+                    <div class="sector-stat"><span class="sector-val">${fmtM(sw)}</span><span class="sector-lbl">workers</span></div>
+                    <div class="sector-stat"><span class="sector-val">${fmtB(sp)}</span><span class="sector-lbl">payroll</span></div>
+                </div>
+                <div class="sector-stat-row">
+                    <div class="sector-stat"><span class="sector-val stat-red">${fmtB(hp)}</span><span class="sector-lbl">exposed wages</span></div>
+                    <div class="sector-stat"><span class="sector-val stat-red">${pctExposed}%</span><span class="sector-lbl">of sector payroll</span></div>
+                </div>
+                <div class="sector-stat-row">
+                    <div class="sector-stat"><span class="sector-val" style="color:${colorScale(avg)}">${avg.toFixed(1)}</span><span class="sector-lbl">avg score</span></div>
+                    <div class="sector-stat"><span class="sector-val">${fmtM(hw)}</span><span class="sector-lbl">high-exposure workers</span></div>
+                </div>
+                ${top3.length ? `<div class="sector-top">Largest exposed:</div>` +
+                    top3.map(d => `<div class="sector-occ">${d.title} <span>${d.ai_score}/10</span></div>`).join("") : ""}
+            `;
+            sectorEl.appendChild(card);
+        });
+
+        // 10. Supply-Demand-AI Scatter
         const scatterData = v.filter(d => d.supply_demand_ratio && d.supply_demand_ratio > 0 && d.supply_demand_ratio < 3);
         const scW = 900, scH = 500, margin = {top: 20, right: 20, bottom: 40, left: 50};
         const scSvg = d3.select("#scatter-chart").append("svg").attr("width", scW).attr("height", scH);

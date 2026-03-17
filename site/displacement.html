@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canadian AI Job Displacement — 2026-2029 Outlook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e293b;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #3b82f6;
+    --wave1: #f59e0b;
+    --wave1-bg: rgba(245,158,11,0.1);
+    --wave2: #ef4444;
+    --wave2-bg: rgba(239,68,68,0.1);
+    --wave3: #8b5cf6;
+    --wave3-bg: rgba(139,92,246,0.1);
+    --green: #10b981;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(59,130,246,0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--wave2) 0%, #f97316 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto 32px;
+    font-weight: 300;
+  }
+
+  /* BIG NUMBERS ROW */
+  .big-numbers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px 0;
+  }
+  .big-number {
+    text-align: center;
+    padding: 28px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: transform 0.2s;
+  }
+  .big-number:hover { transform: translateY(-2px); }
+  .big-number .value {
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .big-number:nth-child(1) .value { color: var(--wave2); }
+  .big-number:nth-child(2) .value { color: var(--wave1); }
+  .big-number:nth-child(3) .value { color: var(--accent); }
+  .big-number .label {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    padding: 48px 0 24px;
+    text-align: center;
+  }
+  .section-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .section-header p {
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding: 20px 0 40px;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--wave1), var(--wave2), var(--wave3));
+    transform: translateX(-50%);
+    opacity: 0.3;
+  }
+  .wave-card {
+    position: relative;
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .wave-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .wave-inner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .wave-card:nth-child(1) .wave-inner { border-left: 3px solid var(--wave1); }
+  .wave-card:nth-child(2) .wave-inner { border-left: 3px solid var(--wave2); }
+  .wave-card:nth-child(3) .wave-inner { border-left: 3px solid var(--wave3); }
+
+  .wave-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .wave-card:nth-child(1) .wave-badge { background: var(--wave1-bg); color: var(--wave1); }
+  .wave-card:nth-child(2) .wave-badge { background: var(--wave2-bg); color: var(--wave2); }
+  .wave-card:nth-child(3) .wave-badge { background: var(--wave3-bg); color: var(--wave3); }
+
+  .wave-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .wave-subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .wave-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .wave-stat {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .wave-stat .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .wave-card:nth-child(1) .stat-value { color: var(--wave1); }
+  .wave-card:nth-child(2) .stat-value { color: var(--wave2); }
+  .wave-card:nth-child(3) .stat-value { color: var(--wave3); }
+  .wave-stat .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .wave-jobs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .job-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-dim);
+    white-space: nowrap;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .job-chip:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+  }
+  .job-chip .chip-count {
+    font-weight: 700;
+    margin-left: 4px;
+    opacity: 0.7;
+  }
+
+  /* CUMULATIVE CHART */
+  .chart-section {
+    padding: 40px 0;
+  }
+  .chart-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+  }
+  .chart-svg {
+    width: 100%;
+    height: 320px;
+  }
+
+  /* BAR CHART */
+  .bar-section {
+    padding: 0 0 48px;
+  }
+  .bar-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .bar-label {
+    width: 220px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: right;
+    padding-right: 16px;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 32px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    width: 0;
+  }
+  .bar-fill.w1 { background: linear-gradient(90deg, var(--wave1), rgba(245,158,11,0.6)); }
+  .bar-fill.w2 { background: linear-gradient(90deg, var(--wave2), rgba(239,68,68,0.6)); }
+  .bar-fill.w3 { background: linear-gradient(90deg, var(--wave3), rgba(139,92,246,0.6)); }
+
+  .bar-amount {
+    width: 80px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    padding-left: 12px;
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  .footer p {
+    font-size: 12px;
+    color: var(--text-dim);
+    opacity: 0.6;
+  }
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* WATERMARK */
+  .watermark {
+    position: fixed;
+    bottom: 16px;
+    right: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    opacity: 0.3;
+    font-weight: 500;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .big-numbers { grid-template-columns: 1fr; gap: 12px; }
+    .wave-stats { grid-template-columns: 1fr; }
+    .bar-label { width: 130px; font-size: 11px; }
+    .timeline-line { display: none; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: countUp 0.6s ease-out forwards;
+  }
+
+  /* Cumulative area chart */
+  .area-wave1 { fill: var(--wave1); opacity: 0.15; }
+  .area-wave2 { fill: var(--wave2); opacity: 0.15; }
+  .area-wave3 { fill: var(--wave3); opacity: 0.15; }
+  .line-wave1 { stroke: var(--wave1); fill: none; stroke-width: 2.5; }
+  .line-wave2 { stroke: var(--wave2); fill: none; stroke-width: 2.5; }
+  .line-wave3 { stroke: var(--wave3); fill: none; stroke-width: 2.5; }
+  .line-total { stroke: #fff; fill: none; stroke-width: 3; stroke-dasharray: 6 4; }
+  .grid-line { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+  .axis-label { fill: var(--text-dim); font-size: 12px; font-family: 'Inter', sans-serif; }
+  .chart-dot {
+    fill: #fff;
+    stroke: var(--bg);
+    stroke-width: 2;
+    r: 5;
+    cursor: pointer;
+    transition: r 0.2s;
+  }
+  .chart-dot:hover { r: 7; }
+
+  .tooltip {
+    position: absolute;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+    min-width: 180px;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip-title { font-weight: 700; margin-bottom: 4px; }
+  .tooltip-row { display: flex; justify-content: space-between; gap: 16px; }
+  .tooltip-label { color: var(--text-dim); }
+  .tooltip-value { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Data Analysis &bull; 516 Occupations Scored</div>
+    <h1>5.6 Million Canadian Jobs<br>Face <span class="highlight">AI Disruption</span></h1>
+    <p class="hero-sub">A wave-by-wave look at $450 billion in payroll exposure over the next three years, based on AI exposure scoring of every occupation in the Canadian economy.</p>
+  </div>
+
+  <!-- BIG NUMBERS -->
+  <div class="big-numbers">
+    <div class="big-number">
+      <div class="value" data-target="5.6" data-suffix="M">0</div>
+      <div class="label">Workers in high-exposure roles</div>
+    </div>
+    <div class="big-number">
+      <div class="value" data-target="450" data-prefix="$" data-suffix="B">0</div>
+      <div class="label">Annual payroll at risk</div>
+    </div>
+    <div class="big-number">
+      <div class="value" data-target="28" data-suffix="%">0</div>
+      <div class="label">Of total Canadian workforce</div>
+    </div>
+  </div>
+
+  <!-- WAVE TIMELINE -->
+  <div class="section-header">
+    <h2>Three Waves of Disruption</h2>
+    <p>AI adoption won't hit all sectors at once. Here's the likely sequence.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-line"></div>
+
+    <!-- WAVE 1 -->
+    <div class="wave-card" data-wave="1">
+      <div class="wave-inner">
+        <div class="wave-badge">Wave 1 &mdash; 2026</div>
+        <div class="wave-title">Clerical & Administrative</div>
+        <div class="wave-subtitle">Routine cognitive tasks — data entry, scheduling, bookkeeping — automated first by current-gen AI</div>
+        <div class="wave-stats">
+          <div class="wave-stat">
+            <div class="stat-value">2.0M</div>
+            <div class="stat-label">Workers affected</div>
+          </div>
+          <div class="wave-stat">
+            <div class="stat-value">$118B</div>
+            <div class="stat-label">Payroll exposed</div>
+          </div>
+        </div>
+        <div class="wave-jobs">
+          <div class="job-chip">Administrative Assistants <span class="chip-count">234K</span></div>
+          <div class="job-chip">Bookkeepers <span class="chip-count">204K</span></div>
+          <div class="job-chip">Customer Service Reps <span class="chip-count">182K</span></div>
+          <div class="job-chip">Accounting Clerks <span class="chip-count">151K</span></div>
+          <div class="job-chip">Office Support Workers <span class="chip-count">129K</span></div>
+          <div class="job-chip">Business Consultants <span class="chip-count">122K</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAVE 2 -->
+    <div class="wave-card" data-wave="2">
+      <div class="wave-inner">
+        <div class="wave-badge">Wave 2 &mdash; 2027</div>
+        <div class="wave-title">Finance, Legal & Professional Services</div>
+        <div class="wave-subtitle">Structured professional work — auditing, contract review, financial analysis — disrupted by advanced reasoning models</div>
+        <div class="wave-stats">
+          <div class="wave-stat">
+            <div class="stat-value">1.9M</div>
+            <div class="stat-label">Workers affected</div>
+          </div>
+          <div class="wave-stat">
+            <div class="stat-value">$173B</div>
+            <div class="stat-label">Payroll exposed</div>
+          </div>
+        </div>
+        <div class="wave-jobs">
+          <div class="job-chip">Financial Auditors & Accountants <span class="chip-count">247K</span></div>
+          <div class="job-chip">Marketing & Advertising <span class="chip-count">234K</span></div>
+          <div class="job-chip">Lawyers <span class="chip-count">124K</span></div>
+          <div class="job-chip">HR Professionals <span class="chip-count">127K</span></div>
+          <div class="job-chip">Financial Advisors <span class="chip-count">119K</span></div>
+          <div class="job-chip">Financial Managers <span class="chip-count">78K</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAVE 3 -->
+    <div class="wave-card" data-wave="3">
+      <div class="wave-inner">
+        <div class="wave-badge">Wave 3 &mdash; 2028-2029</div>
+        <div class="wave-title">Technology & Knowledge Work</div>
+        <div class="wave-subtitle">Complex knowledge work — software development, research, education, design — as AI coding and creative tools mature</div>
+        <div class="wave-stats">
+          <div class="wave-stat">
+            <div class="stat-value">1.7M</div>
+            <div class="stat-label">Workers affected</div>
+          </div>
+          <div class="wave-stat">
+            <div class="stat-value">$159B</div>
+            <div class="stat-label">Payroll exposed</div>
+          </div>
+        </div>
+        <div class="wave-jobs">
+          <div class="job-chip">IT Systems Specialists <span class="chip-count">229K</span></div>
+          <div class="job-chip">Software Developers <span class="chip-count">156K</span></div>
+          <div class="job-chip">College Instructors <span class="chip-count">131K</span></div>
+          <div class="job-chip">IT Managers <span class="chip-count">124K</span></div>
+          <div class="job-chip">Software Engineers <span class="chip-count">113K</span></div>
+          <div class="job-chip">Graphic Designers <span class="chip-count">93K</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUMULATIVE CHART -->
+  <div class="chart-section">
+    <div class="section-header" style="padding-top: 20px;">
+      <h2>Cumulative Payroll Disruption</h2>
+      <p>How $450B in exposed payroll accumulates as each wave hits</p>
+    </div>
+    <div class="chart-container">
+      <div class="tooltip" id="tooltip">
+        <div class="tooltip-title"></div>
+        <div class="tooltip-row"><span class="tooltip-label">Workers:</span> <span class="tooltip-value" id="tt-workers"></span></div>
+        <div class="tooltip-row"><span class="tooltip-label">Payroll:</span> <span class="tooltip-value" id="tt-payroll"></span></div>
+        <div class="tooltip-row"><span class="tooltip-label">Cumulative:</span> <span class="tooltip-value" id="tt-cumulative"></span></div>
+      </div>
+      <svg class="chart-svg" id="cumChart" viewBox="0 0 1040 320"></svg>
+    </div>
+  </div>
+
+  <!-- TOP OCCUPATIONS BAR CHART -->
+  <div class="bar-section">
+    <div class="section-header" style="padding-top: 20px;">
+      <h2>Largest Payroll Exposures</h2>
+      <p>The 10 occupations with the most annual payroll at risk</p>
+    </div>
+    <div class="bar-container" id="barChart"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Data: StatCan NOC 2021 &bull; ESDC Wages 2025 &bull; Census 2021 Employment &bull; AI exposure scored via Claude (0-10 rubric, 7+ = high exposure)</p>
+    <p style="margin-top:6px;">Built from analysis of 516 Canadian occupations &bull; <a href="https://github.com/JoshKale/jobs" target="_blank">Methodology based on JoshKale/jobs</a></p>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const waves = [
+  { name: "Clerical & Admin", workers: 2.0, payrollB: 118, color: "#f59e0b", year: "2026" },
+  { name: "Finance, Legal & Professional", workers: 1.9, payrollB: 173, color: "#ef4444", year: "2027" },
+  { name: "Technology & Knowledge", workers: 1.7, payrollB: 159, color: "#8b5cf6", year: "2028-29" }
+];
+
+const topJobs = [
+  { title: "IT Systems Specialists", payroll: 22.0, wave: 3 },
+  { title: "Financial Auditors & Accountants", payroll: 20.8, wave: 2 },
+  { title: "Marketing & Advertising Pros", payroll: 17.3, wave: 2 },
+  { title: "IT Managers", payroll: 17.2, wave: 3 },
+  { title: "Software Developers", payroll: 15.6, wave: 3 },
+  { title: "Lawyers & Notaries", payroll: 15.5, wave: 2 },
+  { title: "Administrative Officers", payroll: 14.4, wave: 1 },
+  { title: "Software Engineers", payroll: 13.3, wave: 3 },
+  { title: "Administrative Assistants", payroll: 12.9, wave: 1 },
+  { title: "College Instructors", payroll: 12.3, wave: 3 },
+];
+
+// ===== ANIMATED COUNTERS =====
+function animateCounters() {
+  document.querySelectorAll('.big-number .value').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const decimals = target < 10 ? 1 : 0;
+    const duration = 1500;
+    const start = performance.now();
+
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = (target * eased).toFixed(decimals);
+      el.textContent = prefix + current + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ===== WAVE CARDS SCROLL ANIMATION =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.wave-card').forEach(card => observer.observe(card));
+
+// ===== CUMULATIVE AREA CHART =====
+function drawChart() {
+  const svg = document.getElementById('cumChart');
+  const W = 1040, H = 320;
+  const pad = { top: 30, right: 30, bottom: 50, left: 70 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  // Timeline points: Q1 2026, Q3 2026, Q1 2027, Q3 2027, Q1 2028, Q1 2029
+  const points = [
+    { label: "Now",      w1: 0,   w2: 0,   w3: 0   },
+    { label: "Mid 2026", w1: 60,  w2: 0,   w3: 0   },
+    { label: "End 2026", w1: 118, w2: 20,  w3: 0   },
+    { label: "Mid 2027", w1: 118, w2: 100, w3: 15  },
+    { label: "End 2027", w1: 118, w2: 173, w3: 45  },
+    { label: "Mid 2028", w1: 118, w2: 173, w3: 100 },
+    { label: "End 2029", w1: 118, w2: 173, w3: 159 },
+  ];
+  const maxVal = 460;
+
+  const xScale = (i) => pad.left + (i / (points.length - 1)) * cw;
+  const yScale = (v) => pad.top + ch - (v / maxVal) * ch;
+
+  let html = '';
+
+  // Grid lines
+  for (let v = 0; v <= 450; v += 100) {
+    const y = yScale(v);
+    html += `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" class="grid-line"/>`;
+    html += `<text x="${pad.left - 10}" y="${y + 4}" class="axis-label" text-anchor="end">$${v}B</text>`;
+  }
+
+  // X axis labels
+  points.forEach((p, i) => {
+    const x = xScale(i);
+    html += `<text x="${x}" y="${H - 10}" class="axis-label" text-anchor="middle">${p.label}</text>`;
+    html += `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + ch}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>`;
+  });
+
+  // Stacked area paths
+  function areaPath(getData, className) {
+    let top = '', bottom = '';
+    points.forEach((p, i) => {
+      const x = xScale(i);
+      const val = getData(p);
+      const y = yScale(val);
+      top += (i === 0 ? 'M' : 'L') + `${x},${y}`;
+    });
+    for (let i = points.length - 1; i >= 0; i--) {
+      const x = xScale(i);
+      bottom += `L${x},${yScale(0)}`;
+    }
+    return `<path d="${top}${bottom}Z" class="${className}"/>`;
+  }
+
+  function linePath(getData, className) {
+    let d = '';
+    points.forEach((p, i) => {
+      const x = xScale(i);
+      const y = yScale(getData(p));
+      d += (i === 0 ? 'M' : 'L') + `${x},${y}`;
+    });
+    return `<path d="${d}" class="${className}"/>`;
+  }
+
+  // Total (all three stacked)
+  html += areaPath(p => p.w1 + p.w2 + p.w3, 'area-wave3');
+  html += areaPath(p => p.w1 + p.w2, 'area-wave2');
+  html += areaPath(p => p.w1, 'area-wave1');
+
+  // Lines
+  html += linePath(p => p.w1, 'line-wave1');
+  html += linePath(p => p.w1 + p.w2, 'line-wave2');
+  html += linePath(p => p.w1 + p.w2 + p.w3, 'line-total');
+
+  // Dots on total line with tooltip data
+  points.forEach((p, i) => {
+    const x = xScale(i);
+    const total = p.w1 + p.w2 + p.w3;
+    const y = yScale(total);
+    html += `<circle cx="${x}" cy="${y}" class="chart-dot" data-label="${p.label}" data-w1="${p.w1}" data-w2="${p.w2}" data-w3="${p.w3}" data-total="${total}"/>`;
+  });
+
+  // Legend
+  const legendY = pad.top + 5;
+  const legendItems = [
+    { label: "Clerical & Admin", color: "#f59e0b" },
+    { label: "Finance & Legal", color: "#ef4444" },
+    { label: "Tech & Knowledge", color: "#8b5cf6" },
+    { label: "Cumulative Total", color: "#fff", dash: true },
+  ];
+  legendItems.forEach((item, i) => {
+    const lx = pad.left + 10 + i * 190;
+    if (item.dash) {
+      html += `<line x1="${lx}" y1="${legendY}" x2="${lx + 24}" y2="${legendY}" stroke="${item.color}" stroke-width="2.5" stroke-dasharray="5 3"/>`;
+    } else {
+      html += `<rect x="${lx}" y="${legendY - 5}" width="24" height="10" rx="2" fill="${item.color}" opacity="0.4"/>`;
+    }
+    html += `<text x="${lx + 30}" y="${legendY + 4}" class="axis-label" font-size="11">${item.label}</text>`;
+  });
+
+  svg.innerHTML = html;
+
+  // Tooltip interactions
+  const tooltip = document.getElementById('tooltip');
+  svg.querySelectorAll('.chart-dot').forEach(dot => {
+    dot.addEventListener('mouseenter', (e) => {
+      const rect = svg.closest('.chart-container').getBoundingClientRect();
+      const dotRect = dot.getBoundingClientRect();
+      tooltip.querySelector('.tooltip-title').textContent = dot.dataset.label;
+      document.getElementById('tt-workers').textContent =
+        ((parseFloat(dot.dataset.w1)/118*2.0 + parseFloat(dot.dataset.w2)/173*1.9 + parseFloat(dot.dataset.w3)/159*1.7)).toFixed(1) + 'M workers';
+      document.getElementById('tt-payroll').textContent = '$' + parseFloat(dot.dataset.total).toFixed(0) + 'B';
+      document.getElementById('tt-cumulative').textContent = '$' + parseFloat(dot.dataset.total).toFixed(0) + 'B total';
+      tooltip.style.left = (dotRect.left - rect.left + 15) + 'px';
+      tooltip.style.top = (dotRect.top - rect.top - 70) + 'px';
+      tooltip.classList.add('show');
+    });
+    dot.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('show');
+    });
+  });
+}
+
+// ===== BAR CHART =====
+function drawBars() {
+  const container = document.getElementById('barChart');
+  const maxPayroll = Math.max(...topJobs.map(j => j.payroll));
+  const waveColors = ['', 'w1', 'w2', 'w3'];
+  const waveNames = ['', 'Wave 1', 'Wave 2', 'Wave 3'];
+
+  let html = '';
+  topJobs.forEach((job, i) => {
+    const pct = (job.payroll / maxPayroll) * 100;
+    html += `
+      <div class="bar-row">
+        <div class="bar-label">${job.title}</div>
+        <div class="bar-track">
+          <div class="bar-fill ${waveColors[job.wave]}" data-width="${pct}" style="transition-delay: ${i * 80}ms">${waveNames[job.wave]}</div>
+        </div>
+        <div class="bar-amount" style="color: var(--wave${job.wave})">$${job.payroll.toFixed(1)}B</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+
+  // Animate bars on scroll
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width + '%';
+        });
+        barObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  barObserver.observe(container);
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  // Small delay for visual impact
+  setTimeout(animateCounters, 300);
+  drawChart();
+  drawBars();
+
+  // Trigger wave cards on load if visible
+  setTimeout(() => {
+    document.querySelectorAll('.wave-card').forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight) card.classList.add('visible');
+    });
+  }, 200);
+});
+</script>
+
+</body>
+</html>

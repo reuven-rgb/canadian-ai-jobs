@@ -223,6 +223,75 @@ tbody td {
 
 tbody tr:hover { background: #1e2d4d; }
 
+/* Sector split cards */
+.sector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.sector-card {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 16px 18px;
+    border: 1px solid #2a3555;
+}
+
+.sector-header {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid;
+}
+
+.sector-stat-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.sector-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sector-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e0e0e0;
+    line-height: 1.2;
+}
+
+.sector-lbl {
+    font-size: 10px;
+    color: #888;
+}
+
+.sector-top {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+.sector-occ {
+    font-size: 11px;
+    color: #ccc;
+    padding: 2px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sector-occ span {
+    color: #888;
+    flex-shrink: 0;
+    margin-left: 6px;
+}
+
 /* Scatter plot */
 #scatter-chart {
     position: relative;
